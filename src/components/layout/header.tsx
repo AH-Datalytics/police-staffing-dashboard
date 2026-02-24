@@ -27,8 +27,8 @@ export function Header() {
       </div>
       <div className="flex items-center gap-3">
         <span className="text-xs text-gray-400">Sample CFS Data</span>
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-          21
+        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-semibold">
+          21CP
         </div>
       </div>
     </header>
