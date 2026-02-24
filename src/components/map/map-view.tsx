@@ -2,20 +2,20 @@
 
 import { useRef, useEffect, useState } from 'react';
 import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface MapViewProps {
   center: { lat: number; lng: number };
   geojson: GeoJSON.FeatureCollection;
-  onLoad?: () => void;
 }
 
-export default function MapView({ center, geojson, onLoad }: MapViewProps) {
+export default function MapView({ center, geojson }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize map
+  // Initialize map — runs once on mount
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -46,17 +46,17 @@ export default function MapView({ center, geojson, onLoad }: MapViewProps) {
         zoom: 12.5,
       });
 
+      mapRef.current = map;
+
       map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 
       map.on('load', () => {
-        mapRef.current = map;
         setReady(true);
-        onLoad?.();
       });
 
       map.on('error', (e) => {
         console.error('MapLibre error:', e);
-        setError('Map failed to load');
+        setError('Map failed to load. Check browser console for details.');
       });
     } catch (e) {
       console.error('MapLibre init error:', e);
@@ -69,9 +69,10 @@ export default function MapView({ center, geojson, onLoad }: MapViewProps) {
         mapRef.current = null;
       }
     };
-  }, [center, onLoad]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Update data
+  // Update data source when geojson changes
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
@@ -127,18 +128,21 @@ export default function MapView({ center, geojson, onLoad }: MapViewProps) {
 
   if (error) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-        <p className="text-sm text-red-500">{error}</p>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6' }}>
+        <p style={{ fontSize: 14, color: '#ef4444' }}>{error}</p>
       </div>
     );
   }
 
   return (
     <>
-      <div ref={containerRef} className="absolute inset-0" />
+      <div
+        ref={containerRef}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' }}
+      />
       {!ready && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <p className="text-sm text-gray-400">Loading map...</p>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6' }}>
+          <p style={{ fontSize: 14, color: '#9ca3af' }}>Loading map...</p>
         </div>
       )}
     </>
