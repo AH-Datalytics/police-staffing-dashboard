@@ -5,7 +5,6 @@ import { Filter } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { incidentData, agencyConfig } from '@/lib/data/sample-data-loader';
-import { getHeatmapColor } from '@/lib/utils/color';
 import { formatHour, getDayName } from '@/lib/utils/format';
 import { cn } from '@/lib/utils/cn';
 
@@ -17,7 +16,8 @@ interface MapFilters {
 
 export default function MapPage() {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(true);
   const [filters, setFilters] = useState<MapFilters>({
@@ -57,11 +57,14 @@ export default function MapPage() {
 
     let cancelled = false;
 
-    import('maplibre-gl').then((maplibregl) => {
+    import('maplibre-gl').then((mod) => {
       if (cancelled || !mapContainer.current) return;
 
+      // Handle both ESM named exports and CJS default export
+      const maplibregl = (mod.default && mod.default.Map) ? mod.default : mod;
+
       const center = agencyConfig.districtCenters['central'];
-      const map = new maplibregl.default.Map({
+      const map = new maplibregl.Map({
         container: mapContainer.current,
         style: {
           version: 8,
@@ -87,7 +90,7 @@ export default function MapPage() {
         zoom: 12.5,
       });
 
-      map.addControl(new maplibregl.default.NavigationControl(), 'bottom-right');
+      map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 
       map.on('load', () => {
         if (cancelled) return;
@@ -106,7 +109,8 @@ export default function MapPage() {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
 
-    const source = map.getSource('incidents') as maplibregl.GeoJSONSource | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const source = map.getSource('incidents') as any;
 
     if (source) {
       source.setData(geojson as GeoJSON.FeatureCollection);
