@@ -9,7 +9,6 @@ const navItems = [
   { href: '/', label: 'Overview' },
   { href: '/staffing', label: 'Staffing' },
   { href: '/demand', label: 'Demand' },
-  { href: '/map', label: 'Map' },
   { href: '/scenarios', label: 'Scenarios' },
   { href: '/guide', label: 'Methodology' },
 ];
