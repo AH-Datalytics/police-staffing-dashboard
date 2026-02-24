@@ -64,7 +64,12 @@ export default function DistrictPage() {
         Back to Overview
       </Link>
 
-      <h2 className="text-xl font-bold text-gray-900">{districtLabel} District</h2>
+      <h2
+        className="text-2xl font-bold text-gray-900 tracking-tight border-b border-gray-200 pb-4"
+        style={{ fontFamily: 'var(--font-serif), Georgia, serif' }}
+      >
+        {districtLabel} District
+      </h2>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

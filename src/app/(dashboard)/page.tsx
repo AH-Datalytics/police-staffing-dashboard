@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Users, UserPlus, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { PageShell } from '@/components/layout/page-shell';
 import { KpiCard } from '@/components/dashboard/kpi-card';
 import { ControlsPanel } from '@/components/controls/controls-panel';
@@ -28,35 +27,39 @@ export default function OverviewPage() {
 
   return (
     <PageShell>
-      {/* Intro */}
-      <div>
-        <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
-          This dashboard models patrol staffing needs based on calls-for-service data.
-          Adjust the controls below to explore how different assumptions affect recommended staffing levels.{' '}
-          <Link href="/guide" className="text-blue-600 hover:underline">
-            Learn how this works &rarr;
+      {/* Headline */}
+      <div className="border-b border-gray-200 pb-5">
+        <h2
+          className="text-2xl font-bold text-gray-900 tracking-tight"
+          style={{ fontFamily: 'var(--font-serif), Georgia, serif' }}
+        >
+          How many officers does this agency need?
+        </h2>
+        <p className="mt-2 text-[15px] text-gray-500 leading-relaxed max-w-2xl">
+          This model calculates patrol staffing from a full year of calls-for-service data.
+          Adjust the assumptions below and watch the numbers update in real time.{' '}
+          <Link href="/guide" className="text-gray-900 underline underline-offset-2 decoration-gray-300 hover:decoration-gray-900">
+            Read the methodology
           </Link>
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <KpiCard
-          title="Proposed Staffing"
+          title="Proposed"
           value={result.totalProposed}
           format={(n) => formatNumber(n)}
-          subtitle="total officers the model recommends"
-          icon={<Users className="w-5 h-5" />}
+          subtitle="officers recommended"
         />
         <KpiCard
-          title="Current Staffing"
+          title="Current"
           value={Math.round(result.totalCurrent)}
           format={(n) => formatNumber(n)}
-          subtitle="officers currently assigned"
-          icon={<ShieldCheck className="w-5 h-5" />}
+          subtitle="officers assigned"
         />
         <KpiCard
-          title="Staffing Gap"
+          title="Gap"
           value={result.totalGap}
           format={(n) => {
             const sign = n > 0 ? '+' : '';
@@ -64,14 +67,12 @@ export default function OverviewPage() {
           }}
           trend={result.totalGap > 0 ? 'up' : 'down'}
           trendLabel={result.totalGap > 0 ? 'understaffed' : 'surplus'}
-          icon={<AlertTriangle className="w-5 h-5" />}
         />
         <KpiCard
           title="Relief Factor"
           value={result.reliefFactor}
-          format={(n) => n.toFixed(2)}
-          subtitle="officers per filled position"
-          icon={<UserPlus className="w-5 h-5" />}
+          format={(n) => n.toFixed(2) + '\u00d7'}
+          subtitle="roster multiplier"
         />
       </div>
 
@@ -80,12 +81,11 @@ export default function OverviewPage() {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Staffing Bar Chart */}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle>Current vs Proposed Staffing</CardTitle>
-              <InfoTooltip content="Gray bars show how many officers are currently assigned to each district. Blue bars show the model's recommendation based on call volume and your selected assumptions." />
+              <CardTitle>Current vs. Proposed</CardTitle>
+              <InfoTooltip content="Gray bars show current staffing. Blue bars show the model's recommendation based on call volume and your assumptions." />
             </div>
           </CardHeader>
           <CardContent>
@@ -93,18 +93,17 @@ export default function OverviewPage() {
           </CardContent>
         </Card>
 
-        {/* Demand Heatmap */}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle>Demand by Hour & Day of Week</CardTitle>
-              <InfoTooltip content="Each cell shows the number of officers needed during that hour. Warmer colors mean higher demand. Hover over any cell for the exact value." />
+              <CardTitle>Demand by Hour & Day</CardTitle>
+              <InfoTooltip content="Each cell shows officers needed during that hour. Blue is low demand, red is high. Hover for exact values." />
             </div>
           </CardHeader>
           <CardContent>
             <DemandHeatmap data={demandGrid} compact />
-            <p className="text-xs text-gray-400 mt-3 italic">
-              Rows are days of the week. Columns are hours (0&ndash;23). Hover for details.
+            <p className="text-[11px] text-gray-400 mt-3">
+              Rows = days of the week. Columns = hours (midnight to 11 PM). Hover any cell for details.
             </p>
           </CardContent>
         </Card>
@@ -114,8 +113,8 @@ export default function OverviewPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CardTitle>Staffing Summary by District & Shift</CardTitle>
-            <InfoTooltip content="Click a district name to see its detailed breakdown. 'Gap' is the difference between proposed and current staffing — positive means more officers are needed." />
+            <CardTitle>By District & Shift</CardTitle>
+            <InfoTooltip content="Click a district name for a detailed breakdown. Positive gaps (red) mean more officers are needed." />
           </div>
         </CardHeader>
         <CardContent>
@@ -123,46 +122,40 @@ export default function OverviewPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-2 px-3 font-medium text-gray-500">District</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-500">Shift</th>
-                  <th className="text-right py-2 px-3 font-medium text-gray-500">
-                    Current
-                  </th>
-                  <th className="text-right py-2 px-3 font-medium text-gray-500">
-                    Proposed
-                  </th>
-                  <th className="text-right py-2 px-3 font-medium text-gray-500">
-                    Gap
-                  </th>
+                  <th className="text-left py-2.5 px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">District</th>
+                  <th className="text-left py-2.5 px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Shift</th>
+                  <th className="text-right py-2.5 px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Current</th>
+                  <th className="text-right py-2.5 px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Proposed</th>
+                  <th className="text-right py-2.5 px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Gap</th>
                 </tr>
               </thead>
               <tbody>
                 {result.districts.map((d) =>
                   d.shifts.map((s, si) => (
-                    <tr key={`${d.district}-${s.shiftId}`} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={`${d.district}-${s.shiftId}`} className="border-b border-gray-100 hover:bg-gray-50/50">
                       {si === 0 && (
                         <td
-                          className="py-2 px-3 font-medium text-gray-900"
+                          className="py-2.5 px-3 font-medium text-gray-900"
                           rowSpan={d.shifts.length}
                         >
                           <Link
                             href={`/district/${d.district}`}
-                            className="text-blue-600 hover:text-blue-700 hover:underline"
+                            className="underline underline-offset-2 decoration-gray-300 hover:decoration-gray-900"
                           >
                             {d.districtLabel}
                           </Link>
                         </td>
                       )}
-                      <td className="py-2 px-3 text-gray-600">{s.shiftLabel}</td>
-                      <td className="py-2 px-3 text-right text-gray-600">
+                      <td className="py-2.5 px-3 text-gray-500">{s.shiftLabel}</td>
+                      <td className="py-2.5 px-3 text-right text-gray-500 tabular-nums">
                         {s.currentStaffing.toFixed(1)}
                       </td>
-                      <td className="py-2 px-3 text-right font-medium text-gray-900">
+                      <td className="py-2.5 px-3 text-right font-semibold text-gray-900 tabular-nums">
                         {s.proposedWithRelief}
                       </td>
                       <td
-                        className={`py-2 px-3 text-right font-medium ${
-                          s.gap > 0 ? 'text-red-600' : s.gap < 0 ? 'text-green-600' : 'text-gray-500'
+                        className={`py-2.5 px-3 text-right font-semibold tabular-nums ${
+                          s.gap > 0 ? 'text-red-600' : s.gap < 0 ? 'text-green-600' : 'text-gray-400'
                         }`}
                       >
                         {s.gap > 0 ? '+' : ''}{s.gap.toFixed(1)}
@@ -170,19 +163,18 @@ export default function OverviewPage() {
                     </tr>
                   ))
                 )}
-                {/* Totals */}
-                <tr className="border-t-2 border-gray-300 font-semibold">
-                  <td className="py-2 px-3 text-gray-900" colSpan={2}>
-                    Agency Total
+                <tr className="border-t-2 border-gray-900">
+                  <td className="py-2.5 px-3 font-semibold text-gray-900" colSpan={2}>
+                    Total
                   </td>
-                  <td className="py-2 px-3 text-right text-gray-600">
+                  <td className="py-2.5 px-3 text-right text-gray-500 font-semibold tabular-nums">
                     {result.totalCurrent.toFixed(1)}
                   </td>
-                  <td className="py-2 px-3 text-right text-gray-900">
+                  <td className="py-2.5 px-3 text-right font-bold text-gray-900 tabular-nums">
                     {result.totalProposed}
                   </td>
                   <td
-                    className={`py-2 px-3 text-right ${
+                    className={`py-2.5 px-3 text-right font-bold tabular-nums ${
                       result.totalGap > 0 ? 'text-red-600' : 'text-green-600'
                     }`}
                   >
@@ -192,9 +184,6 @@ export default function OverviewPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-gray-400 mt-3 italic">
-            Click a district name to drill into its breakdown. Positive gaps (red) indicate understaffing.
-          </p>
         </CardContent>
       </Card>
     </PageShell>

@@ -13,11 +13,19 @@ export default function StaffingPage() {
 
   return (
     <PageShell>
-      <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
-        Fine-tune the model&apos;s assumptions. Edit the relief factor inputs on the left to reflect
-        your agency&apos;s leave policies. On the right, adjust which call types require a sworn officer
-        response — reducing a category models the impact of civilian alternatives.
-      </p>
+      <div className="border-b border-gray-200 pb-5">
+        <h2
+          className="text-2xl font-bold text-gray-900 tracking-tight"
+          style={{ fontFamily: 'var(--font-serif), Georgia, serif' }}
+        >
+          Staffing Detail
+        </h2>
+        <p className="mt-2 text-[15px] text-gray-500 leading-relaxed max-w-2xl">
+          Fine-tune the model&apos;s assumptions. Edit the relief factor inputs on the left to reflect
+          your agency&apos;s leave policies. On the right, adjust which call types require a sworn officer
+          response — reducing a category models the impact of civilian alternatives.
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Relief Factor */}

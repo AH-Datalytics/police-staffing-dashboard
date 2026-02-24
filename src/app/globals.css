@@ -2,6 +2,7 @@
 
 @theme inline {
   --font-sans: var(--font-inter);
+  --font-serif: var(--font-serif);
 }
 
 /* Custom scrollbar */
@@ -27,4 +28,9 @@
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   opacity: 1;
+}
+
+/* Smooth transitions globally */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

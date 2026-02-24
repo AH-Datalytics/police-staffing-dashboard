@@ -1,29 +1,18 @@
 'use client';
 
-import { Sidebar } from '@/components/layout/sidebar';
-import { Header } from '@/components/layout/header';
-import { useUIStore } from '@/stores/ui-store';
-import { cn } from '@/lib/utils/cn';
+import { TopNav } from '@/components/layout/top-nav';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const sidebarOpen = useUIStore((s) => s.sidebarOpen);
-
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <div
-        className={cn(
-          'transition-all duration-300',
-          sidebarOpen ? 'ml-56' : 'ml-16'
-        )}
-      >
-        <Header />
-        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <TopNav />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
     </div>
   );
 }

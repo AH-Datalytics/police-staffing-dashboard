@@ -49,10 +49,15 @@ export default function ScenariosPage() {
   return (
     <PageShell>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="border-b border-gray-200 pb-5 flex items-end justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Saved Scenarios</h2>
-          <p className="text-sm text-gray-500">
+          <h2
+            className="text-2xl font-bold text-gray-900 tracking-tight"
+            style={{ fontFamily: 'var(--font-serif), Georgia, serif' }}
+          >
+            Compare Scenarios
+          </h2>
+          <p className="mt-2 text-[15px] text-gray-500 max-w-xl leading-relaxed">
             Save your current model settings as a named scenario, then change assumptions and save another. Select any two to compare side by side.
           </p>
         </div>

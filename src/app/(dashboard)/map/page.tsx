@@ -86,7 +86,7 @@ export default function MapPage() {
   });
 
   return (
-    <div className="h-[calc(100vh-4rem)] relative">
+    <div className="h-[calc(100vh-7rem)] relative -mx-4 sm:-mx-6 lg:-mx-8 rounded-lg overflow-hidden">
       {/* Map area */}
       <div className="absolute inset-0 bg-gray-900">
         <svg width="100%" height="100%" viewBox={`0 0 ${svgWidth} ${svgHeight}`} preserveAspectRatio="xMidYMid meet">

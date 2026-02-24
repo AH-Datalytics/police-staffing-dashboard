@@ -81,11 +81,18 @@ export default function DemandPage() {
 
   return (
     <PageShell>
-      <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
-        Explore when demand for officers is highest. The heatmap below reveals patterns
-        across hours and days of the week. Use the animated cycle to watch demand rise and
-        fall through a 24-hour period.
-      </p>
+      <div className="border-b border-gray-200 pb-5">
+        <h2
+          className="text-2xl font-bold text-gray-900 tracking-tight"
+          style={{ fontFamily: 'var(--font-serif), Georgia, serif' }}
+        >
+          When are officers needed most?
+        </h2>
+        <p className="mt-2 text-[15px] text-gray-500 leading-relaxed max-w-2xl">
+          The heatmap reveals demand patterns across hours and days of the week.
+          Use the animated cycle to watch demand rise and fall through a 24-hour period.
+        </p>
+      </div>
 
       {/* District Tabs + Heatmap */}
       <Card>

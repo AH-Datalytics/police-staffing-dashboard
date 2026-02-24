@@ -7,11 +7,14 @@ export default function GuidePage() {
   return (
     <PageShell className="max-w-3xl mx-auto">
       {/* Hero */}
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+      <div className="border-b border-gray-200 pb-5">
+        <h2
+          className="text-2xl font-bold text-gray-900 tracking-tight"
+          style={{ fontFamily: 'var(--font-serif), Georgia, serif' }}
+        >
           How This Dashboard Works
         </h2>
-        <p className="text-base text-gray-500 leading-relaxed">
+        <p className="mt-2 text-[15px] text-gray-500 leading-relaxed">
           A guide to understanding the staffing model, its inputs, and how to
           use interactive controls to explore different scenarios.
         </p>

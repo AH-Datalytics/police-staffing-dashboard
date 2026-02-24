@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -7,9 +7,15 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  weight: ['400', '600', '700'],
+});
+
 export const metadata: Metadata = {
-  title: 'Police Staffing Dashboard | 21CP Solutions',
-  description: 'Interactive police staffing analysis and scenario modeling dashboard',
+  title: 'Police Staffing Analysis',
+  description: 'Interactive police staffing analysis and scenario modeling',
 };
 
 export default function RootLayout({
@@ -19,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
+      <body className={`${inter.variable} ${sourceSerif.variable} font-sans antialiased bg-white text-gray-900`}>
         {children}
       </body>
     </html>
