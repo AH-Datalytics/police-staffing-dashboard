@@ -25,12 +25,7 @@ export function Header() {
         <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
         <p className="text-xs text-gray-500">{agencyConfig.agencyName}</p>
       </div>
-      <div className="flex items-center gap-3">
-        <span className="text-xs text-gray-400">Sample CFS Data</span>
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-semibold">
-          21CP
-        </div>
-      </div>
+      <span className="text-xs text-gray-400">Sample CFS Data</span>
     </header>
   );
 }
