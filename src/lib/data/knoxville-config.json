@@ -1,0 +1,83 @@
+{
+  "agencyName": "Knoxville Police Department",
+  "districts": [
+    "west",
+    "central",
+    "east"
+  ],
+  "districtLabels": {
+    "west": "West",
+    "central": "Central",
+    "east": "East"
+  },
+  "shifts": [
+    {
+      "id": "day",
+      "label": "6AM - 6PM",
+      "startHour": 6,
+      "endHour": 18
+    },
+    {
+      "id": "night",
+      "label": "6PM - 6AM",
+      "startHour": 18,
+      "endHour": 6
+    },
+    {
+      "id": "power",
+      "label": "3PM - 3AM",
+      "startHour": 15,
+      "endHour": 3
+    }
+  ],
+  "shiftLengthHours": 12,
+  "currentStaffing": {
+    "west": {
+      "day": 14,
+      "night": 12,
+      "power": 9
+    },
+    "central": {
+      "day": 9,
+      "night": 7,
+      "power": 5
+    },
+    "east": {
+      "day": 10,
+      "night": 9,
+      "power": 8
+    }
+  },
+  "defaults": {
+    "respondingCFS": 0.4,
+    "communityTime": 0.2,
+    "proactiveTime": 0.2,
+    "adminTime": 0.2,
+    "onePersonCarPct": 1.0,
+    "agencySize": 90,
+    "kpdSize": 130
+  },
+  "reliefFactorDefaults": {
+    "personalTimeDays": 4,
+    "vacationDays": 12,
+    "holidayDays": 12,
+    "sickLeaveDays": 5,
+    "trainingDays": 5,
+    "regularDaysOff": 182.5,
+    "otherDaysOut": 1
+  },
+  "districtCenters": {
+    "west": {
+      "lat": 35.9606,
+      "lng": -83.95
+    },
+    "central": {
+      "lat": 35.9606,
+      "lng": -83.9207
+    },
+    "east": {
+      "lat": 35.9606,
+      "lng": -83.89
+    }
+  }
+}
