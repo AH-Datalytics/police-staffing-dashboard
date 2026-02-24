@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils/cn';
 const MapView = dynamic(() => import('@/components/map/map-view'), {
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-      <p className="text-sm text-gray-400">Loading map...</p>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6' }}>
+      <p style={{ fontSize: 14, color: '#9ca3af' }}>Loading map...</p>
     </div>
   ),
 });

@@ -15,7 +15,7 @@ export default function MapView({ center, geojson }: MapViewProps) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize map — runs once on mount
+  // Initialize map once on mount
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -25,29 +25,32 @@ export default function MapView({ center, geojson }: MapViewProps) {
         style: {
           version: 8,
           sources: {
-            'osm-tiles': {
+            'carto-light': {
               type: 'raster',
-              tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+              tiles: [
+                'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+                'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+                'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+              ],
               tileSize: 256,
-              attribution: '&copy; OpenStreetMap contributors',
+              attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             },
           },
           layers: [
             {
-              id: 'osm-tiles',
+              id: 'carto-light',
               type: 'raster',
-              source: 'osm-tiles',
+              source: 'carto-light',
               minzoom: 0,
               maxzoom: 19,
             },
           ],
         },
         center: [center.lng, center.lat],
-        zoom: 12.5,
+        zoom: 11.5,
       });
 
       mapRef.current = map;
-
       map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 
       map.on('load', () => {
@@ -56,7 +59,7 @@ export default function MapView({ center, geojson }: MapViewProps) {
 
       map.on('error', (e) => {
         console.error('MapLibre error:', e);
-        setError('Map failed to load. Check browser console for details.');
+        setError('Map tiles failed to load.');
       });
     } catch (e) {
       console.error('MapLibre init error:', e);
@@ -82,10 +85,7 @@ export default function MapView({ center, geojson }: MapViewProps) {
     if (source) {
       source.setData(geojson);
     } else {
-      map.addSource('incidents', {
-        type: 'geojson',
-        data: geojson,
-      });
+      map.addSource('incidents', { type: 'geojson', data: geojson });
 
       map.addLayer({
         id: 'incidents-heat',
@@ -93,20 +93,20 @@ export default function MapView({ center, geojson }: MapViewProps) {
         source: 'incidents',
         paint: {
           'heatmap-weight': 1,
-          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 10, 1, 15, 3],
+          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 9, 0.5, 12, 2, 15, 4],
           'heatmap-color': [
             'interpolate',
             ['linear'],
             ['heatmap-density'],
             0, 'rgba(0,0,0,0)',
-            0.1, 'rgb(59,130,246)',
-            0.3, 'rgb(96,165,250)',
-            0.5, 'rgb(251,191,36)',
-            0.7, 'rgb(245,158,11)',
-            1, 'rgb(239,68,68)',
+            0.15, 'rgba(59,130,246,0.4)',
+            0.35, 'rgba(96,165,250,0.6)',
+            0.5, 'rgba(251,191,36,0.7)',
+            0.7, 'rgba(245,158,11,0.8)',
+            1, 'rgba(239,68,68,0.85)',
           ],
-          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 10, 15, 14, 25, 16, 40],
-          'heatmap-opacity': 0.75,
+          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 9, 10, 12, 20, 15, 35],
+          'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 13, 0.8, 16, 0.4],
         },
       });
 
@@ -114,11 +114,11 @@ export default function MapView({ center, geojson }: MapViewProps) {
         id: 'incidents-points',
         type: 'circle',
         source: 'incidents',
-        minzoom: 14,
+        minzoom: 13,
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 14, 2, 18, 6],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 13, 2, 17, 7],
           'circle-color': 'rgb(59,130,246)',
-          'circle-opacity': 0.6,
+          'circle-opacity': ['interpolate', ['linear'], ['zoom'], 13, 0, 14, 0.6],
           'circle-stroke-width': 0.5,
           'circle-stroke-color': '#fff',
         },
