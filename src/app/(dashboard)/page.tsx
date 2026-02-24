@@ -79,35 +79,34 @@ export default function OverviewPage() {
       {/* Controls */}
       <ControlsPanel />
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <CardTitle>Current vs. Proposed</CardTitle>
-              <InfoTooltip content="Gray bars show current staffing. Blue bars show the model's recommendation based on call volume and your assumptions." />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <StaffingBarChart districts={result.districts} mode="total" />
-          </CardContent>
-        </Card>
+      {/* Demand Heatmap — full width */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CardTitle>Demand by Hour & Day of Week</CardTitle>
+            <InfoTooltip content="Each cell shows officers needed during that hour. Blue is low demand, red is high. Hover for exact values." />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <DemandHeatmap data={demandGrid} />
+          <p className="text-[11px] text-gray-400 mt-3">
+            Rows = days of the week. Columns = hours (midnight to 11 PM). Hover any cell for details.
+          </p>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <CardTitle>Demand by Hour & Day</CardTitle>
-              <InfoTooltip content="Each cell shows officers needed during that hour. Blue is low demand, red is high. Hover for exact values." />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <DemandHeatmap data={demandGrid} compact />
-            <p className="text-[11px] text-gray-400 mt-3">
-              Rows = days of the week. Columns = hours (midnight to 11 PM). Hover any cell for details.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Staffing Bar Chart */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CardTitle>Current vs. Proposed by District</CardTitle>
+            <InfoTooltip content="Gray bars show current staffing. Blue bars show the model's recommendation based on call volume and your assumptions." />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <StaffingBarChart districts={result.districts} mode="total" />
+        </CardContent>
+      </Card>
 
       {/* District Summary Table */}
       <Card>

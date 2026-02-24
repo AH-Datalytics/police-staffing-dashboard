@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { Filter } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,9 @@ interface MapFilters {
 }
 
 export default function MapPage() {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(true);
   const [filters, setFilters] = useState<MapFilters>({
     hourRange: [0, 23],
@@ -31,6 +34,126 @@ export default function MapPage() {
       return true;
     });
   }, [filters]);
+
+  const geojson = useMemo(() => ({
+    type: 'FeatureCollection' as const,
+    features: filteredIncidents.map((inc) => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [inc.lng, inc.lat],
+      },
+      properties: {
+        category: inc.category,
+        district: inc.district,
+        hour: inc.hour,
+      },
+    })),
+  }), [filteredIncidents]);
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainer.current || mapRef.current) return;
+
+    let cancelled = false;
+
+    import('maplibre-gl').then((maplibregl) => {
+      if (cancelled || !mapContainer.current) return;
+
+      const center = agencyConfig.districtCenters['central'];
+      const map = new maplibregl.default.Map({
+        container: mapContainer.current,
+        style: {
+          version: 8,
+          sources: {
+            'osm-tiles': {
+              type: 'raster',
+              tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+              tileSize: 256,
+              attribution: '&copy; OpenStreetMap contributors',
+            },
+          },
+          layers: [
+            {
+              id: 'osm-tiles',
+              type: 'raster',
+              source: 'osm-tiles',
+              minzoom: 0,
+              maxzoom: 19,
+            },
+          ],
+        },
+        center: [center.lng, center.lat],
+        zoom: 12.5,
+      });
+
+      map.addControl(new maplibregl.default.NavigationControl(), 'bottom-right');
+
+      map.on('load', () => {
+        if (cancelled) return;
+        mapRef.current = map;
+        setMapLoaded(true);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Update data source when filtered data changes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    const source = map.getSource('incidents') as maplibregl.GeoJSONSource | undefined;
+
+    if (source) {
+      source.setData(geojson as GeoJSON.FeatureCollection);
+    } else {
+      map.addSource('incidents', {
+        type: 'geojson',
+        data: geojson as GeoJSON.FeatureCollection,
+      });
+
+      map.addLayer({
+        id: 'incidents-heat',
+        type: 'heatmap',
+        source: 'incidents',
+        paint: {
+          'heatmap-weight': 1,
+          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 10, 1, 15, 3],
+          'heatmap-color': [
+            'interpolate',
+            ['linear'],
+            ['heatmap-density'],
+            0, 'rgba(0,0,0,0)',
+            0.1, 'rgb(59,130,246)',
+            0.3, 'rgb(96,165,250)',
+            0.5, 'rgb(251,191,36)',
+            0.7, 'rgb(245,158,11)',
+            1, 'rgb(239,68,68)',
+          ],
+          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 10, 15, 14, 25, 16, 40],
+          'heatmap-opacity': 0.75,
+        },
+      });
+
+      map.addLayer({
+        id: 'incidents-points',
+        type: 'circle',
+        source: 'incidents',
+        minzoom: 14,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 14, 2, 18, 6],
+          'circle-color': 'rgb(59,130,246)',
+          'circle-opacity': 0.6,
+          'circle-stroke-width': 0.5,
+          'circle-stroke-color': '#fff',
+        },
+      });
+    }
+  }, [geojson, mapLoaded]);
 
   const toggleDay = useCallback((day: number) => {
     setFilters((f) => ({
@@ -48,126 +171,25 @@ export default function MapPage() {
     }));
   }, []);
 
-  // Aggregate incidents into grid cells for heatmap rendering
-  const heatmapCells = useMemo(() => {
-    const cellSize = 0.003; // ~300m grid cells
-    const cells = new Map<string, { lat: number; lng: number; count: number }>();
-
-    for (const inc of filteredIncidents) {
-      const gridLat = Math.round(inc.lat / cellSize) * cellSize;
-      const gridLng = Math.round(inc.lng / cellSize) * cellSize;
-      const key = `${gridLat}:${gridLng}`;
-      const cell = cells.get(key);
-      if (cell) {
-        cell.count++;
-      } else {
-        cells.set(key, { lat: gridLat, lng: gridLng, count: 1 });
-      }
-    }
-
-    return Array.from(cells.values());
-  }, [filteredIncidents]);
-
-  const maxCount = Math.max(1, ...heatmapCells.map((c) => c.count));
-
-  // Map bounds
-  const centerLat = 35.9606;
-  const centerLng = -83.9207;
-
-  // SVG-based map visualization
-  const svgWidth = 800;
-  const svgHeight = 500;
-  const latRange = 0.06;
-  const lngRange = 0.1;
-
-  const toSvg = (lat: number, lng: number) => ({
-    x: ((lng - (centerLng - lngRange / 2)) / lngRange) * svgWidth,
-    y: ((centerLat + latRange / 2 - lat) / latRange) * svgHeight,
-  });
-
   return (
     <div className="h-[calc(100vh-7rem)] relative -mx-4 sm:-mx-6 lg:-mx-8 rounded-lg overflow-hidden">
-      {/* Map area */}
-      <div className="absolute inset-0 bg-gray-900">
-        <svg width="100%" height="100%" viewBox={`0 0 ${svgWidth} ${svgHeight}`} preserveAspectRatio="xMidYMid meet">
-          {/* Background */}
-          <rect width={svgWidth} height={svgHeight} fill="#1a1a2e" />
+      {/* MapLibre container */}
+      <div ref={mapContainer} className="absolute inset-0" />
 
-          {/* Grid lines */}
-          {Array.from({ length: 10 }, (_, i) => {
-            const x = (i / 9) * svgWidth;
-            return (
-              <line key={`v${i}`} x1={x} y1={0} x2={x} y2={svgHeight} stroke="#2a2a3e" strokeWidth={0.5} />
-            );
-          })}
-          {Array.from({ length: 7 }, (_, i) => {
-            const y = (i / 6) * svgHeight;
-            return (
-              <line key={`h${i}`} x1={0} y1={y} x2={svgWidth} y2={y} stroke="#2a2a3e" strokeWidth={0.5} />
-            );
-          })}
-
-          {/* District labels */}
-          {agencyConfig.districts.map((d) => {
-            const center = agencyConfig.districtCenters[d];
-            const pos = toSvg(center.lat, center.lng);
-            return (
-              <text
-                key={d}
-                x={pos.x}
-                y={pos.y - 60}
-                textAnchor="middle"
-                fill="#6b7280"
-                fontSize={14}
-                fontWeight={600}
-              >
-                {agencyConfig.districtLabels[d]} District
-              </text>
-            );
-          })}
-
-          {/* Heatmap cells */}
-          {heatmapCells.map((cell, i) => {
-            const pos = toSvg(cell.lat, cell.lng);
-            const intensity = cell.count / maxCount;
-            const radius = 4 + intensity * 12;
-            const color = getHeatmapColor(cell.count, 0, maxCount);
-
-            return (
-              <circle
-                key={i}
-                cx={pos.x}
-                cy={pos.y}
-                r={radius}
-                fill={color}
-                opacity={0.4 + intensity * 0.4}
-              >
-                <title>{cell.count} incidents</title>
-              </circle>
-            );
-          })}
-
-          {/* District center markers */}
-          {agencyConfig.districts.map((d) => {
-            const center = agencyConfig.districtCenters[d];
-            const pos = toSvg(center.lat, center.lng);
-            return (
-              <g key={`marker-${d}`}>
-                <circle cx={pos.x} cy={pos.y} r={6} fill="white" stroke="#3b82f6" strokeWidth={2} />
-              </g>
-            );
-          })}
-        </svg>
-
-        {/* Incident count overlay */}
-        <div className="absolute bottom-4 left-4 bg-gray-950/80 backdrop-blur text-white rounded-lg px-4 py-3">
-          <p className="text-xs text-gray-400">Showing</p>
-          <p className="text-2xl font-bold">{filteredIncidents.length.toLocaleString()}</p>
-          <p className="text-xs text-gray-400">incidents</p>
-          <p className="text-[10px] text-gray-500 mt-1.5 max-w-[180px] leading-relaxed">
-            Brighter, larger circles indicate higher incident density. Use filters to narrow by time or district.
-          </p>
+      {/* Loading state */}
+      {!mapLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <p className="text-sm text-gray-400">Loading map...</p>
         </div>
+      )}
+
+      {/* Incident count overlay */}
+      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg px-4 py-3 shadow-lg border border-gray-200">
+        <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Showing</p>
+        <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'var(--font-serif), Georgia, serif' }}>
+          {filteredIncidents.length.toLocaleString()}
+        </p>
+        <p className="text-[11px] text-gray-400">incidents</p>
       </div>
 
       {/* Filter panel */}
@@ -176,21 +198,21 @@ export default function MapPage() {
           variant="secondary"
           size="sm"
           onClick={() => setFiltersOpen(!filtersOpen)}
-          className="mb-2 bg-white shadow-lg"
+          className="mb-2 bg-white shadow-lg border-gray-200"
         >
           <Filter className="w-3.5 h-3.5" />
           Filters
         </Button>
 
         {filtersOpen && (
-          <Card className="w-64 shadow-xl">
+          <Card className="w-64 shadow-xl bg-white/95 backdrop-blur">
             <div className="p-4 space-y-4">
               {/* Hour range */}
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Hours: {formatHour(filters.hourRange[0])} - {formatHour(filters.hourRange[1])}
+                <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                  Hours: {formatHour(filters.hourRange[0])} &ndash; {formatHour(filters.hourRange[1])}
                 </label>
-                <div className="flex gap-2 mt-1">
+                <div className="flex gap-2 mt-1.5">
                   <input
                     type="range"
                     min={0}
@@ -222,19 +244,19 @@ export default function MapPage() {
 
               {/* Day of week */}
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
                   Days of Week
                 </label>
-                <div className="flex flex-wrap gap-1 mt-1">
+                <div className="flex flex-wrap gap-1 mt-1.5">
                   {[0, 1, 2, 3, 4, 5, 6].map((d) => (
                     <button
                       key={d}
                       onClick={() => toggleDay(d)}
                       className={cn(
-                        'px-2 py-1 text-xs rounded font-medium transition-colors',
+                        'px-2 py-1 text-[11px] rounded font-medium transition-colors',
                         filters.days.includes(d)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                          ? 'bg-gray-900 text-white'
+                          : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                       )}
                     >
                       {getDayName(d)}
@@ -245,19 +267,19 @@ export default function MapPage() {
 
               {/* Districts */}
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
                   Districts
                 </label>
-                <div className="flex flex-wrap gap-1 mt-1">
+                <div className="flex flex-wrap gap-1 mt-1.5">
                   {agencyConfig.districts.map((d) => (
                     <button
                       key={d}
                       onClick={() => toggleDistrict(d)}
                       className={cn(
-                        'px-2 py-1 text-xs rounded font-medium transition-colors',
+                        'px-2 py-1 text-[11px] rounded font-medium transition-colors',
                         filters.districts.includes(d)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                          ? 'bg-gray-900 text-white'
+                          : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                       )}
                     >
                       {agencyConfig.districtLabels[d]}

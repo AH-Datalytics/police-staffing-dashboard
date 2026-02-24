@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Shield } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 const navItems = [
@@ -22,14 +23,10 @@ export function TopNav() {
       <div className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded bg-gray-900 flex items-center justify-center">
-              <span className="text-white text-[10px] font-bold leading-none">21</span>
-            </div>
-            <div>
-              <span className="text-sm font-semibold text-gray-900 tracking-tight">
-                Police Staffing Analysis
-              </span>
-            </div>
+            <Shield className="w-4 h-4 text-gray-900" />
+            <span className="text-sm font-semibold text-gray-900 tracking-tight">
+              Police Staffing Analysis
+            </span>
           </Link>
           <span className="text-[11px] text-gray-400 hidden sm:block">
             Interactive staffing model &middot; Sample agency data
