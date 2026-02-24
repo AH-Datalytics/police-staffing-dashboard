@@ -1,10 +1,10 @@
 import type { CFSRow, UnitsRow, IncidentPoint } from '@/types/cfs';
 import type { AgencyConfig } from '@/types/agency';
 
-import cfsRaw from './knoxville-cfs.json';
-import unitsRaw from './knoxville-units.json';
-import configRaw from './knoxville-config.json';
-import incidentsRaw from './knoxville-incidents.json';
+import cfsRaw from './sample-cfs.json';
+import unitsRaw from './sample-units.json';
+import configRaw from './sample-config.json';
+import incidentsRaw from './sample-incidents.json';
 
 export const cfsData: CFSRow[] = cfsRaw as CFSRow[];
 export const unitsData: UnitsRow[] = unitsRaw as UnitsRow[];
@@ -46,7 +46,7 @@ export function getDefaultCategoryResponsePct(): Record<string, number> {
   for (const { subcategory } of subcats) {
     pct[subcategory] = 1.0;
   }
-  // Default adjustments from Knoxville sample
+  // Default adjustments from sample data
   pct['Welfare Check'] = 0.5;
   pct['Traffic Accident'] = 0.5;
   return pct;

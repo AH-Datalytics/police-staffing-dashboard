@@ -113,7 +113,7 @@ export function calculateAgencyStaffing(
     config.shiftLengthHours
   );
   const personCarFactor = getPersonCarFactor(assumptions.onePersonCarPct);
-  const agencySizeModifier = assumptions.agencySize / config.defaults.kpdSize;
+  const agencySizeModifier = assumptions.agencySize / config.defaults.baselineSize;
 
   const cfsAgg = aggregateCFSData(cfsData, assumptions.categoryResponsePct);
   const unitsLookup = buildUnitsLookup(unitsData);

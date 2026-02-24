@@ -164,6 +164,9 @@ export default function MapPage() {
           <p className="text-xs text-gray-400">Showing</p>
           <p className="text-2xl font-bold">{filteredIncidents.length.toLocaleString()}</p>
           <p className="text-xs text-gray-400">incidents</p>
+          <p className="text-[10px] text-gray-500 mt-1.5 max-w-[180px] leading-relaxed">
+            Brighter, larger circles indicate higher incident density. Use filters to narrow by time or district.
+          </p>
         </div>
       </div>
 

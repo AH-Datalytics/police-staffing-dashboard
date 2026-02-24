@@ -9,6 +9,7 @@ const pageTitles: Record<string, string> = {
   '/demand': 'Demand Analysis',
   '/map': 'Map View',
   '/scenarios': 'Scenarios',
+  '/guide': 'How It Works',
 };
 
 export function Header() {
@@ -25,7 +26,7 @@ export function Header() {
         <p className="text-xs text-gray-500">{agencyConfig.agencyName}</p>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-xs text-gray-400">2022 CFS Data</span>
+        <span className="text-xs text-gray-400">Sample CFS Data</span>
         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
           21
         </div>

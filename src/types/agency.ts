@@ -41,7 +41,7 @@ export interface AgencyConfig {
     adminTime: number;
     onePersonCarPct: number;
     agencySize: number;
-    kpdSize: number;
+    baselineSize: number;
   };
   reliefFactorDefaults: ReliefFactorInputs;
   districtCenters: Record<string, DistrictCenter>;

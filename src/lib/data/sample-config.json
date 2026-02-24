@@ -1,5 +1,5 @@
 {
-  "agencyName": "Knoxville Police Department",
+  "agencyName": "Sample Agency",
   "districts": [
     "west",
     "central",
@@ -55,7 +55,7 @@
     "adminTime": 0.2,
     "onePersonCarPct": 1.0,
     "agencySize": 90,
-    "kpdSize": 130
+    "baselineSize": 130
   },
   "reliefFactorDefaults": {
     "personalTimeDays": 4,

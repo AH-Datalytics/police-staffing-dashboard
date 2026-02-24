@@ -8,6 +8,7 @@ import { ControlsPanel } from '@/components/controls/controls-panel';
 import { StaffingBarChart } from '@/components/charts/staffing-bar-chart';
 import { DemandHeatmap } from '@/components/charts/demand-heatmap';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/tooltip';
 import { useStaffingStore } from '@/stores/staffing-store';
 import { cfsData, unitsData, agencyConfig } from '@/lib/data/sample-data-loader';
 import { aggregateCFSData, buildUnitsLookup, getAgencyDemandGrid } from '@/lib/engine/demand-aggregator';
@@ -27,20 +28,31 @@ export default function OverviewPage() {
 
   return (
     <PageShell>
+      {/* Intro */}
+      <div>
+        <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
+          This dashboard models patrol staffing needs based on calls-for-service data.
+          Adjust the controls below to explore how different assumptions affect recommended staffing levels.{' '}
+          <Link href="/guide" className="text-blue-600 hover:underline">
+            Learn how this works &rarr;
+          </Link>
+        </p>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           title="Proposed Staffing"
           value={result.totalProposed}
           format={(n) => formatNumber(n)}
-          subtitle="officers needed"
+          subtitle="total officers the model recommends"
           icon={<Users className="w-5 h-5" />}
         />
         <KpiCard
           title="Current Staffing"
           value={Math.round(result.totalCurrent)}
           format={(n) => formatNumber(n)}
-          subtitle="officers assigned"
+          subtitle="officers currently assigned"
           icon={<ShieldCheck className="w-5 h-5" />}
         />
         <KpiCard
@@ -51,14 +63,14 @@ export default function OverviewPage() {
             return `${sign}${formatNumber(Math.round(n))}`;
           }}
           trend={result.totalGap > 0 ? 'up' : 'down'}
-          trendLabel={result.totalGap > 0 ? 'understaffed' : 'overstaffed'}
+          trendLabel={result.totalGap > 0 ? 'understaffed' : 'surplus'}
           icon={<AlertTriangle className="w-5 h-5" />}
         />
         <KpiCard
           title="Relief Factor"
           value={result.reliefFactor}
           format={(n) => n.toFixed(2)}
-          subtitle="roster multiplier"
+          subtitle="officers per filled position"
           icon={<UserPlus className="w-5 h-5" />}
         />
       </div>
@@ -71,7 +83,10 @@ export default function OverviewPage() {
         {/* Staffing Bar Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Current vs Proposed Staffing by District</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Current vs Proposed Staffing</CardTitle>
+              <InfoTooltip content="Gray bars show how many officers are currently assigned to each district. Blue bars show the model's recommendation based on call volume and your selected assumptions." />
+            </div>
           </CardHeader>
           <CardContent>
             <StaffingBarChart districts={result.districts} mode="total" />
@@ -81,10 +96,16 @@ export default function OverviewPage() {
         {/* Demand Heatmap */}
         <Card>
           <CardHeader>
-            <CardTitle>Agency-Wide Demand (Officers Needed by Hour & Day)</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Demand by Hour & Day of Week</CardTitle>
+              <InfoTooltip content="Each cell shows the number of officers needed during that hour. Warmer colors mean higher demand. Hover over any cell for the exact value." />
+            </div>
           </CardHeader>
           <CardContent>
             <DemandHeatmap data={demandGrid} compact />
+            <p className="text-xs text-gray-400 mt-3 italic">
+              Rows are days of the week. Columns are hours (0&ndash;23). Hover for details.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -92,7 +113,10 @@ export default function OverviewPage() {
       {/* District Summary Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Staffing Summary by District & Shift</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Staffing Summary by District & Shift</CardTitle>
+            <InfoTooltip content="Click a district name to see its detailed breakdown. 'Gap' is the difference between proposed and current staffing — positive means more officers are needed." />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -101,9 +125,15 @@ export default function OverviewPage() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-2 px-3 font-medium text-gray-500">District</th>
                   <th className="text-left py-2 px-3 font-medium text-gray-500">Shift</th>
-                  <th className="text-right py-2 px-3 font-medium text-gray-500">Current</th>
-                  <th className="text-right py-2 px-3 font-medium text-gray-500">Proposed</th>
-                  <th className="text-right py-2 px-3 font-medium text-gray-500">Gap</th>
+                  <th className="text-right py-2 px-3 font-medium text-gray-500">
+                    Current
+                  </th>
+                  <th className="text-right py-2 px-3 font-medium text-gray-500">
+                    Proposed
+                  </th>
+                  <th className="text-right py-2 px-3 font-medium text-gray-500">
+                    Gap
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -162,6 +192,9 @@ export default function OverviewPage() {
               </tbody>
             </table>
           </div>
+          <p className="text-xs text-gray-400 mt-3 italic">
+            Click a district name to drill into its breakdown. Positive gaps (red) indicate understaffing.
+          </p>
         </CardContent>
       </Card>
     </PageShell>

@@ -17,6 +17,7 @@ import {
   getDistrictDemandGrid,
 } from '@/lib/engine/demand-aggregator';
 import { getPersonCarFactor } from '@/lib/engine/staffing-calculator';
+import { InfoTooltip } from '@/components/ui/tooltip';
 import { formatHour, getDayName } from '@/lib/utils/format';
 
 export default function DemandPage() {
@@ -80,11 +81,20 @@ export default function DemandPage() {
 
   return (
     <PageShell>
+      <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
+        Explore when demand for officers is highest. The heatmap below reveals patterns
+        across hours and days of the week. Use the animated cycle to watch demand rise and
+        fall through a 24-hour period.
+      </p>
+
       {/* District Tabs + Heatmap */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Demand Heatmap (Officers Needed)</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Demand Heatmap</CardTitle>
+              <InfoTooltip content="Each cell represents one hour of one day. Color intensity shows how many officers are needed — blue is low, red is high. Switch between districts using the tabs." />
+            </div>
             <Tabs value={selectedDistrict} onValueChange={setSelectedDistrict}>
               <TabsList>
                 <TabsTrigger value="all">All Districts</TabsTrigger>
@@ -106,7 +116,10 @@ export default function DemandPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>24-Hour Demand Cycle</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>24-Hour Demand Cycle</CardTitle>
+              <InfoTooltip content="Press Play to animate through a full day. Each bar shows demand for that day of the week at the selected hour. Use the scrubber to jump to a specific time." />
+            </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={resetAnim}>
                 <SkipBack className="w-3.5 h-3.5" />
@@ -181,13 +194,20 @@ export default function DemandPage() {
       {/* Call Category Breakdown */}
       <Card>
         <CardHeader>
-          <CardTitle>Call Category Breakdown</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Call Category Breakdown</CardTitle>
+            <InfoTooltip content="The top call categories ranked by volume. Categories with high volume are candidates for alternative response programs, which you can model on the Staffing Detail page." />
+          </div>
         </CardHeader>
         <CardContent>
           <CallCategoryBreakdown
             cfsData={cfsData}
             district={selectedDistrict === 'all' ? null : selectedDistrict}
           />
+          <p className="text-xs text-gray-400 mt-3 italic">
+            To model the effect of diverting specific call types, go to Staffing Detail and adjust
+            the CFS Response Adjustments.
+          </p>
         </CardContent>
       </Card>
     </PageShell>

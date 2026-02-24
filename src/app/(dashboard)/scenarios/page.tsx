@@ -53,7 +53,7 @@ export default function ScenariosPage() {
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Saved Scenarios</h2>
           <p className="text-sm text-gray-500">
-            Save your current assumptions and compare different configurations
+            Save your current model settings as a named scenario, then change assumptions and save another. Select any two to compare side by side.
           </p>
         </div>
         <Button onClick={() => setShowSaveDialog(true)}>
@@ -75,7 +75,7 @@ export default function ScenariosPage() {
                   type="text"
                   value={saveName}
                   onChange={(e) => setSaveName(e.target.value)}
-                  placeholder="e.g., Baseline Knoxville"
+                  placeholder="e.g., Baseline Scenario"
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   autoFocus
                   onKeyDown={(e) => e.key === 'Enter' && handleSave()}
@@ -104,7 +104,9 @@ export default function ScenariosPage() {
             <GitCompareArrows className="w-12 h-12 mx-auto text-gray-300 mb-3" />
             <p className="text-sm text-gray-500">No scenarios saved yet.</p>
             <p className="text-xs text-gray-400 mt-1">
-              Adjust the model controls, then save a scenario to compare later.
+              Adjust the model controls on the Overview or Staffing Detail page, then come
+              back here and click &ldquo;Save Current&rdquo; to capture a snapshot. Scenarios
+              are stored in your browser and persist across sessions.
             </p>
           </CardContent>
         </Card>

@@ -70,7 +70,7 @@ export function ControlsPanel() {
                 Reset to Defaults
               </Button>
               <p className="text-xs text-gray-400">
-                Reset all controls to the Knoxville baseline values.
+                Reset all controls to the default baseline values.
               </p>
             </div>
           </div>

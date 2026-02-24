@@ -5,6 +5,7 @@ import { ReliefFactorEditor } from '@/components/controls/relief-factor-editor';
 import { ResponsePercentEditor } from '@/components/controls/response-percent-editor';
 import { StaffingBarChart } from '@/components/charts/staffing-bar-chart';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/tooltip';
 import { useStaffingStore } from '@/stores/staffing-store';
 
 export default function StaffingPage() {
@@ -12,6 +13,12 @@ export default function StaffingPage() {
 
   return (
     <PageShell>
+      <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
+        Fine-tune the model&apos;s assumptions. Edit the relief factor inputs on the left to reflect
+        your agency&apos;s leave policies. On the right, adjust which call types require a sworn officer
+        response — reducing a category models the impact of civilian alternatives.
+      </p>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Relief Factor */}
         <ReliefFactorEditor />
@@ -23,7 +30,10 @@ export default function StaffingPage() {
       {/* Detailed Staffing Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Staffing by District & Shift</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Staffing by District & Shift</CardTitle>
+            <InfoTooltip content="Each bar pair shows current (gray) vs. proposed (blue) staffing for a specific district and shift. The proposed values reflect all your current assumptions." />
+          </div>
         </CardHeader>
         <CardContent>
           <StaffingBarChart districts={result.districts} mode="byShift" />
@@ -33,7 +43,10 @@ export default function StaffingPage() {
       {/* Detailed Staffing Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Detailed Staffing Grid</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Detailed Staffing Grid</CardTitle>
+            <InfoTooltip content="'Raw Need' is the unrounded officer count before applying the relief factor. 'With Relief' is the final recommendation after accounting for time off and rounding." />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">

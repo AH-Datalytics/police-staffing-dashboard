@@ -8,6 +8,7 @@ import {
   BarChart3,
   Map,
   GitCompareArrows,
+  BookOpen,
   ChevronLeft,
   Shield,
 } from 'lucide-react';
@@ -20,6 +21,7 @@ const navItems = [
   { href: '/demand', label: 'Demand Analysis', icon: BarChart3 },
   { href: '/map', label: 'Map View', icon: Map },
   { href: '/scenarios', label: 'Scenarios', icon: GitCompareArrows },
+  { href: '/guide', label: 'How It Works', icon: BookOpen },
 ];
 
 export function Sidebar() {
